@@ -1,0 +1,583 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[catalan]{babel}
+\usepackage{color}
+\usepackage{tabularx}
+\usepackage{tabu}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\usepackage{ragged2e}  % for '\RaggedRight' macro (allows hyphenation)
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} 
+\usepackage{booktabs}  % for \toprule, \midrule, and \bottomrule macros 
+
+
+%opening
+\title{Project title}
+\author{Albert Ribes Marzá}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+With this project we continue in the same line as the previous ones. We are interested in evaluating the performance we can get by modifying some of the issues in a bus line. We've been summing up a little from the first versions we had. In the begining we were evaluating a system where there were many lines, and had some things into account like the traffic backup that would be produced when many buses from different lines happened to meet at the same point.
+
+\end{abstract}
+
+\tableofcontents
+
+
+
+\section{Descripció del sistema}
+
+\subsection{Descripció informal}
+
+Es vol estudiar el sistema d'una línia d'autobús. Hi ha una sèrie de parades, distribuides per tot el camí, autobusos que comencen el seu recorregut cada cert temps en una parada d'inici i acaben en una de destí, i també hi ha persones, que tenen una parada d'inici i una parada de destí, i que agafaran els autobusos per fer el seu camí.
+
+S'ha comprovat que hi ha un fenomen que podria ser el causant de molts endarreriments importants en molts sistemes similars: donat que les persones necesiten un cert temps per pujar a l'autobus, i han de pujar d'una en una, el fet d'haber-hi més persones a la parada pot endarrerir el recorregut. Però com que a mida que va passant el temps van arribant més persones a la resta de les parades, succeeix una reacció incremental en cadena: es produeix un retard pel motiu que sigui en un moment donat, això fa que s'arribi una mica més tard a la següent parada, causant que hi hagi més gent esperant, endarrerint encara més el recorregut per a la següent parada, i així successivament.
+
+No és unicament el temps del recorregut que es veu afectat per aquest fenomen. També es veuen afectats els temps d'espera que han de fer els clients a les estacions, la ocupació que han de suportar els autobusos, etc.
+
+Per intentar minimitzar aquest efecte, es pot estudiar el comportament d'una línea d'autobus per a uns certs paràmetres, i prendre una decisió al respecte.
+
+\textcolor{red}
+{
+Se van a ir generando autobuses y personas sobre un recorrido determinado \\
+Todo dependera de los parametros de entrada
+Estudiaremos algunas de las situaciones que se producen
+Se trata de una sola línia
+Las personas tienen un origen y un destino
+}
+
+\section{Objectius}
+\subsection{Generals}
+
+Aquest projecte de simulació té per objectiu entendre com poden afectar les decisions preses en els horaris d'una línea de autobús en la velocitat de la mateixa. S'estudien algunes de les situacions en les que pot estar un autobús en un moment donat, la situació de les persones que l'han de fer fer servir i la interacció que tenen diferents autobusos d'una mateixa línia; i es preten veure quines decisions s'han de prendre per minimitzar efectes no desitjats i maximitzar els desitjables.
+
+\textcolor{red}
+{
+Ser capaces de ver cómo se comporta una cierta asignación de recursos para una línia determinada
+}
+\subsection{Específics}
+
+Concretament, aquest projecte vols estudiar els següents aspectes:
+\paragraph{Respecte els autobusos}
+\begin{itemize}
+ \item La quantitat de retard que tenen els autobusos deguts a l'efecte descrit anteriorment
+ \item Els avançaments que por haber de fer un autobús a un altre deguts a retards en el primer
+\end{itemize}
+
+\paragraph{Respecte les parades}
+\begin{itemize}
+ \item El temps que han d'esperar els clients per agafar el seu autobús.
+\end{itemize}
+
+\paragraph{Respecte al recorreguts}
+\begin{itemize}
+ \item La ocupació que ha de suportar un autobús en el cas que hi hagi algun retard.
+\end{itemize}
+
+De tots aquests aspectes volem recollir valors mitjans, valors màxims i quantitat total d'incidències.
+
+Aquestes dades es podran utilitzar per modificar aspectes de la línia com:
+\begin{itemize}
+ \item \textbf{Topologia de la línia:} posar més o menys parades en un recorregut, i com de separades
+ \item \textbf{Frequència de sortida d'un nou autobús:} també està relacionat amb la quantitat total d'autobusos per a la línia
+ \item \textbf{Capacitat dels autobusos:} si és millor posar pocs autobusos amb molta capacitat o el contrari, molts i petits
+ \item \textbf{Velocitat dels autobusos:} potser és recomanable fer obres a la carretera per millorar aquest aspecte
+ \item \textbf{Velocitat per pujar a l'autobus:} posar més portes d'entrada o eixamplar el passadís ajuden en aquest aspecte
+\end{itemize}
+
+És fora de l'abast d'aquest projecte  estudiar el comportament de les persones en una ciutat, els retrasos produits per altes aspectes, com avaries o mala circulació, i les hores punta del dia a dia. És per això aquest temes s'han ignorat en la simulació o s'han simplificat enormement, com per exemple la aparició de persones noves. Si per algun posterior estudi fos necessari estudiar algun d'aquests aspectes es podria modificar l'actual simulació.
+
+
+\textcolor{red}
+{
+Puesto que más adelante ya explico en detalle las variables de salida, aquí solamente hago una pasada rápida. \\
+También intento convencer al lector de que estos son los datos que nos hacen falta para ver los cambios que son necesarios en un horario de autobús
+}
+\section{Descripció del model a implementar}
+
+El model que s'ha implementat és el següent:
+
+S'estudia una sola línia d'autobus no cíclica. La línia té parades distribuides per tot el recorregut. Amb una certa frequència prefixada i amb un factor aleatori van apareixent persones en el model en una certa estació, i tenen una altra com a destí. També amb una certa frequència es van generant autobusos nous, que fan tot el recorregut, sempre en el mateix ordre, fins que arriben a l'ultima estació. Quan arriben a una parada, els passatgers que la tenien com a destí hi baixen, i els que estaven esperant que arrivés i pujen. Sempre podrà haber una quantitat arbitràriament gran de persones en un autobús independentment de la seva capacitat, però es comptabilitzarà la sobrecàrrega que hi hagi hagut i durant quant de temps.
+
+La quantitat de persones que pujen en una estació afecta el seu recorregut: si hi ha més persones l'autobús està més temps parat en aquell lloc fins que torni a avançar.
+
+\textcolor{red}
+{
+Según los datos de entrada se genera un recorrido. \\
+Durante el tiempo que se ha indicado, se van generando autobuses, que empiezan en el origen y terminan al final; también se van gerenrando personas \\
+Se mantiene la ejecución y se estudia con mucho detenimiento qué es lo que está pasando \\ 
+}
+\section{Aspectes metodològics}
+
+El model de simulació emprat és discret: es va executant pas a pas, i en cada un es recull molta informació. En acabar la simulació es mostren totes les dades d'una forma entenedora.
+
+\textcolor{green}{Quizá más adelante pongo alguna otra cosa también, pero de momento lo dejo así.}
+
+\textcolor{red}
+{
+Iremos ejecutando la simulación, step a step, y en cada paso recogemos una cantidad muy grande de datos. \\
+Después los mostramos todos de una manera muy chula \\
+}
+\subsection{Motor de simulació emprat}
+
+El motor de simulació emprat per fer l'estudi és un programa propi, escrit per mi amb el llenguatge de programació ``Python''. Donat que aquest model no requeria gràfics ha sigut una eina adequada tenint en compte la flexibilitat que ofereix i la velocitat de desenvolupament. També ens permet tenir una visió més clara del que realment s'està executant, i facilita afegir més funcionalitat més endavant. També és avantatjós que es tracta d'un llenguatge multi-plataforma i lliure.
+
+\textcolor{red}
+{
+Ejecutamos un programa propio que hemos hecho en python
+}
+\subsection{Justificació de l'us del paradigma de simulació}
+
+S'ha fet servir un paradigma de simulació discreta. Els motius han sigut:
+\begin{itemize}
+ \item Simplicitat: el codi és més senzill i menys propens a errors
+ \item He considerat que aquest tipus de model tindria un resultats molts similars en una simulació discreta i en una contínua. El motiu és que es tracta d'un estudi a llarg termini, és a dir: s'estudia es que succeeix al llarg del temps, i no en un instant determinat. 
+ \item Facilitat: programar un simulador discret és més senzill que un de continu
+ \item Eficiència: els càlculs es simplifiquen i es poden fer de forma més ràpida, consumint menys recursos.
+\end{itemize}
+
+
+\textcolor{red}
+{
+Hemos usado un modelo de simulación discreta porque me ha parecido que reflejaba de forma bastante correcta la realidad y al mismo tiempo mantenía mucha simplicidad en el modelo.
+}
+\section{Especificació en detall del model}
+\textcolor{red}
+{
+Explicar aquí cada uno de los pasos que sigue el programa que hacemos, con todo tipo de detalles
+}
+\subsection{Hipòtesis de simulació usades}
+
+\subsubsection{Simplificadores}
+
+Per fer la simulació s'han fet les següents hipòtesis simplificadores:
+\begin{itemize}
+ \item \textbf{La generació dels clients en el model.} Ja s'ha indicat prèviament que l'estudi del comportament de les persones queda fora de l'abast d'aquesta simulació. Per això s'ha suposat que les persones arriben amb un frequència més o menys constant i que escullen origen i destí aleatòriament. Si per a posterios estudis fos necessari tenir en compte aquest aspecte es podria modificar el simulador, pero aquest no és el cas.
+ \item \textbf{No es tenen en compte retards per altres causes.} Igual que abans, aquesta simulació únicament preten estudiar el fenomen descrit anteriorment, i no es tenen en compte altres aspectes com podrien ser avaries en els autobusos o embussos en la via pública. Es considera que això no afecta al nostre estudi.
+ \item \textbf{La velocitat és constant.} Realment els autobusos han de reduir velocitat quan s'apropen a una parada i han d'accelerar quan es posen en marxa, i això no succeeix en la simulació. De la mateixa manera, en el cas que una estació estigui buida i arribi un autobús, no és té en compte cap tipus d'endarreriment, encara que hagin de baixar persones.
+ \item \textbf{Simulació discreta.} Hem fet la hipòtesi que un model de simulació discreta tindria uns resultats similars als que tindria una simulació contínua.
+\end{itemize}
+
+
+\textcolor{red}
+{
+- Los clientes llegan de forma ordenada \\
+- Quizá es lo mismo, pero...: no hay horas punta y horas muertas. Todo es igual \\
+- Los únicos retrasos que se contemplan son los de la causa que se estudia \\
+- No se contemplan para nada averías ni cosas de ese estilo \\
+- El hecho de parar y volver a arrancar no retrasa a los autobuses. En nuestra simulación, si paras en una parada y no sube ni baja nadie no has perdido ni un instante de tiempo \\
+- La simulación discreta es suficiente para modelar un mundo contínuo
+}
+\subsubsection{Sistèmiques}
+
+Per fer la simulació s'han fet les següents hipòtesis sistèmiques:
+\begin{itemize}
+ \item \textbf{Temps relatius. } El que es triga en fer algunes accions són paràmetres d'entrada de la simualció, i es suposa que estan ben proporcionats. Per exemple, hauria d'haber-hi una certa proporció entre el temps que triguen les persones en pujar a l'autobus i la velocitat que té aquest.
+ \item \textbf{Velocitat dels autobusos.} S'ha suposat que tots els autobusos es mouen a la matèixa velocitat, tot i que en el mon real això pot dependre dels conductors o de la situació de la via pública.
+ \item \textbf{Totes les estacions són igual de populars. } Totes poden rebre una persona nova amb una mateixa probabilitat. En el mon real hi ha parades en les que hi puja molta gent i altes en les que hi puja menys gent.
+ \item \textbf{Es pot superar la capacitat màxima dels autobusos. } Es permet que hi hagi més persones que la capacitat màxima del autobús, però es té en compte a l'hora de recollir les dades. En un cas real pot passar que algunes persones no puguin entrar per falta d'espai.
+ \item \textbf{Un horari uniforme. } Tots els autobusos surten amb un mateix període de temps, no depen de la hora o dels horaris que es puguin haber fixat, com succeiria en un cas real.
+\end{itemize}
+
+
+\textcolor{red}
+{
+- La ejecución discreta refleja bien la ejecución contínua \\
+- Los tiempos que se han elegido para cada cosa se entiende que son correctos, pero solo es una hipótesis \\
+- Todos los autobuses se mueven a la misma velocidad \\
+- Todas las paradas reciben a la misma cantidad de personas, con la misma frecuancia \\
+- Los autobuses pueden superar su capacidad máxima hasta el infinito, pero se es consciente de que se está por encima de la capacidad y forma parte del estdio. Suponemos que nunca nadie se quedará sin subir. \\
+- Los autobuses se generan siempre con los mismos intervalos de tiempo, sin retrasos ni horarios \\
+}
+\subsection{Objectes}
+
+Els objectes definits en el model són:
+
+\paragraph{Autobús}
+Són els que es mouen per tota la línia i van recollint persones. Els atributs que tenen són:
+\begin{itemize}
+ \item Capacitat
+ \item Per cada instant de temps, la ocupació que han tingut
+ \item La posició actual
+ \item L'estat: en circulació o acabat el recorregut
+ \item La quantitat d'autobusos als quals ha avançat
+\end{itemize}
+
+\paragraph{Estació}
+Són els llocs on esperen les persones i a on els autobusos les recullen. Ténen els atributs següents:
+\begin{itemize}
+ \item La seva posició en el recorregut
+ \item Les persones que estan esperant allà
+ \item Per cada autobús que ha passat, el moment en el que ha passat
+\end{itemize}
+
+\paragraph{Persona}
+Són les que s'han de despaçar d'una parada a una altra mitjançant els autobusos. Els atributs que tenen són:
+\begin{itemize}
+ \item La parada d'origen
+ \item La parada de destí
+ \item L'instant de temps en que ha entrat en el model
+ \item L'instant de temps en el que ha pujat en el seu autobús
+ \item L'estat, que pot ser ``esperant'', ``viatjant'' o ``acabat''
+\end{itemize}
+
+
+
+\textcolor{red}
+{
+Los objetos que existen son: \\
+- Autobús. Los atributos que tiene son: \\
++ Capacidad \\
++ Para cada step en el que ha estado funcionando, la ocupación que ha tenido \\
++ La posición en la que se encuentra en un step determinado \\
++ El estado en el que está: running o terminado \\
++ A cuántos autobuses ha adelantado \\
++ Para cada parada, el número de step en el que debería haber llegado. Quizá se puede calcular dinámicamente \\
++ Quizá podemos poner un identificador único de autobús \\
+\\
+- Parada. Los atributos que tiene son: \\
++ La posición en el recorrido que tiene \\
++ La cantidad de personas que están esperando \\
++ Para cada autobús que ha llegado, el momento en el que ha llegado y el momento en el que debería haber llegado \\
++ Quizá podemos poner un identificador único de parada \\
+\\
+- Persona. Los atributos que tiene son: \\
++ La parada de origen \\
++ La parada de destino \\
++ El momento en el que se ha encarnado \\
++ El momento en el que se ha subido al autobús \\
++ El estado actual, que puede ser ``waiting'', ``going'' o ``done''
++ Quizá podemos poner un identificador único de persona \\ 
+}
+
+\subsection{Paràmetres}
+
+Els paràmetres que té en compte aquesta simulació i en els quals es basa per a poder fer tots els càlculs són els següents:
+\begin{itemize}
+ \item \textbf{La posició de cada una de les parades.} S'espedifiquen en el fitxer topology/stations
+ \item \textbf{Els tipus d'autobús que hi ha. } Cada tipus d'autobús té una capacitat máxima i una proporció respecte la resta de tipus.
+ \item \textbf{Frequència d'aparició de les persones.} Pot ser un real entre 0 i 1 i també por ser un enter més gran que 1. Indica quants steps han de passar per a que es generi una nova persona. Sí és menor a 1 es generarán vàries persones cada step, i si és més gran trigarà aquell temps en generar una. És el paràmetre ``people\_freq'' dins dels fitxer params/params
+ \item \textbf{La velocitat dels autobusos. } Indica cuantes posicions del recorregut avancen els autobusos en cada step. És el paràmetre ``bus\_speed'' dins del fitxer params/params
+ \item \textbf{La quantitat d'execucions. } Permet fer vàries execucions amb uns mateixos paràmetres. És el paràmetre ``num\_exec'' dins del fitxer params/params
+ \item \textbf{Temps per pujar a l'autobus. } El temps que triga cada persona en pujar a l'autobus quan aquest està a la parada. És un enter. És el paràmetre ``load\_time'' dins del fitxer params/params
+ \item \textbf{La frequència amb la que es generen nous autobusos. } Indica els steps que han de passar fins que es generi un nou autobús. És sempre una quantitat entera. És el paràmetre ``bus\_freq'' dins del fitxer params/params
+ \item \textbf{Steps totals d'execució. } Indica durant quant de temps es mantindrà en marxa l'exdcució. És el paràmetre ``exec\_steps'' dins del fitxer params/params
+ \item \textbf{Temps permés per cada parada. } Indica els temps que pot estar un autobús a una parada sense que es consideri que va endarrerir. És el paràmetre ``time\_per\_station'' dins del fitxer params/params.
+\end{itemize}
+
+
+\textcolor{red}
+{
+Los parámetros que tiene nuestra ejecución son: \\
+- La posición de cada una de las paradas \\
+- Los tipos de autobús que hay, según la capacidad \\
+- Las proporciones en los tipos de autobuses que hay \\
+- La frecuencia de aparición de personas \\
+- La velocidad de los autobuses \\
+- La cantidad de ejecuciones que se quiere hacer con unos mismos parámetros \\ (quizá esto no es un parámetro) \\
+- Lo que se tarda en subir a un autobús \\
+- La frecuencia con la que se generan nuevos autobuses \\
+- El total de steps que habrá durante una ejecución \\
+}
+\subsection{Variables d'estat}
+
+Durant cada instant de temps es mantenen les variables següents:
+\begin{itemize}
+ \item L'instant de temps actual
+ \item La informació de cadascun dels autobusos
+ \item La informació de cadasuna de les parades
+ \item La informació de cadascuna de les persones
+ \item El nombre de l'execució que s'està fent. El simulador permet executar vàries vegades amb els mateixos paràmetres.
+\end{itemize}
+
+
+\textcolor{red}
+{
+En cada uno de los steps se mantiene: \\
+- El instante de tiempo actual \\
+- Los autobuses que hay en cada una de las paradas \\
+\textcolor{red}
+{
+Estudiar para una línia determinada y una asignación de recursos cómo se comporta: \\
+Respecto a los autobuses: \\
+- El total de steps de retraso que se ha producido en todos los autobuses \\
+- Los steps de retraso que se han producido en media entre todos los autobuses \\
+- Para cada autobús, el retraso medio que ha tenido en cada parada\\
+- El máximo retraso que ha habido entre todas las paradas \\
+- Cuantas veces ocurre que un autobús adelante al que tenía delante porque se ha retrasado \\
+\\
+Respecto a las paradas: \\
+- El tiempo medio que se han esperado las personas entre todas las paradas \\
+- El tiempo medio que se han esperado las personas en cada una de las paradas \\
+- El máximo de tiempo que ha tenido que esperar una persona a su autobús \\
+- En cada parada, el retraso medio que han ido teniendo los autobuses
+\\
+Respecto a los viajes: \\
+- Para cada autobús, la ocupación media que ha tenido durante el recorrido \\
+- La ocupación media que han tenido todos los autobuses en todo el tiempo \\
+- Para cada autobús, el máximo de ocupación que ha tenido en su recorrido \\
+- El máximo de ocupación que se ha producido entre todos los autobuses \\
+}osiciones \\
+- Las personas que se encuentran en cada parada \\
+- El número de ejecución que estamos haciendo \\
+}
+\subsection{Successos}
+
+Els successos que es poden produir durant la simulació són:
+\begin{itemize}
+ \item Un nou autobús comença el seu recorregut
+ \item Una nova persona ha arribat a una estació
+ \item Un autobús ha arrivat a una estació
+ \item Un autobús ha avançat un altre
+ \item Un autobús ha acabat el seu recorregut
+\end{itemize}
+
+
+\textcolor{red}
+{
+Los sucesos que contemplamos son: \\
+- Se genera un autobús nuevo \\
+- Se genera una nueva persona \\
+- Un autobús llega a una parada \\
+- Un autobús llega a la última parada \\
+- Un autobús adelanta a otro autobús \\
+}
+
+\subsection{Dades d'entrada}
+
+Les dades d'entrada són els paràmetres que s'han indicat prèviament. Aquesta es tota la informació que es pot variar d'execució en execució.
+
+\textcolor{green}
+{
+Datos de entrada y parametros son lo mismo. Si se me ocurre la diferencia lo pondré, y si no puedo indicar esto mismo o puedo saltarme este punto
+}
+\subsubsection{Taules explicatives de les dades}
+
+Totes les dades d'entrada per a la simulació són escrites es fitxers de dades. Per modificarles només és necessari modificat aquests fitxers. \emph{MAI} és necessari modificar el codi del simulador per a modificar una dada d'entrada.
+Les dades que es poden entrar són:
+
+
+\begin{table}[]
+\centering
+\caption{My caption}
+\label{my-label}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Nom} & \textbf{Descripció}                                                                                                              & \textbf{Aclaracions}                                                                                                   \\ \hline
+bus\_speed   & \begin{tabular}[c]{@{}l@{}}Indica la quantitat de\\ posicions que avancen \\ els autobusos cada\\ instant de temps.\end{tabular} & \begin{tabular}[c]{@{}l@{}}Si hi ha una estació\\ més propera que\\ bus\_speed avancen\\ fins a l'estacio\end{tabular} \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+             &                                                                                                                                  &                                                                                                                        \\ \hline
+\end{tabular}
+\end{table}
+
+
+\textcolor{red}
+{
+Pues eso, poner los mismos datos \\
+Quizá puedo poner ejemplos de cómo está puesto, o poner lo que se espera que se ponga
+}
+\subsubsection{Disponibilitat o us de traces de processos}
+\textcolor{green}
+{
+No tengo ni idea de lo que significa esto. Lo más probable es que me lo salte
+}
+\subsubsection{Explicació de l'adequació de les distribucions deduides i utilitzades}
+
+\textcolor{red}{Esto solo es necesario si se han analizado y ajustado los datos de entrada}
+
+\textcolor{red}
+{
+Las distribuciones que se usan son: \\
+- Creación de los autobuses: aparecen de forma determinista cada cierto tiempo. He usado esto porque en la realidad esto es algo que podremos forzar, y no dependerá del azar \\
+- El momento de aparición de personas nuevas. Es bastante aleatorio, pero es algo que se puede cambiar según la situación en la que nos encontremos. Esto es algo que se decide según el contexto \\
+- Las paradas que se eligen como origen y destino. Lo mismo que más arriba. De momento es algo aleatorio, pero se puede cambiar según se requiera \\
+}
+
+\subsubsection{Reflexió sobre la aleatorietat dels processos}
+
+No hi ha massa aleatorietat durant la execució d'aquesta simulació, però una mica sí que hi ha. El motiu és que preten simular un entorn que no és del tot determinista, però que està molt relacionat amb patrons horaris i repetició de les mateixes accions. Per això no es pot predir exactament com serà el dia a dia d'una línea d'autobús, però sí que es poden fer aproximacions bastant segures.
+
+La dificultat d'aquest estudi no resideix en la incertesa de les dades sino en el fet que poden ser una mica caòtiques. És per això que no es consideren massa importants les distribucions utilitzadas, sent conscients que si en el futur tinguessin un paper més important s'hauria d'estudiar millor.
+
+\textcolor{red}
+{
+No es el objetivo de este estudio ver estas cosas, y por eso se usa uno cualquiera. Si fuera de verdad importante se podría cambiar sin ningún problema
+}
+
+\subsubsection{Utilitat de la introducció de la aleatorietat}
+
+En aquesta simulació la aleatorietat es fa servir per fer el sistema una mica més caòtic i per tenir un ventall més ampli de les possibilitats a estudiar, però no juga un paper important en les resolucions preses després d'aquest estudi.
+
+\textcolor{red}
+{
+Estamos en un terreno un poco aleatorio, y es necesario un sistema que sea un poco flexible. Puesto que no podemos suponer que sabremos las personas que habrá, se hace necesaria la aletoriedad, aunque no debe ser decisiva
+}
+
+\subsection{Variables de sortida}
+
+Les variables de sortida que té aquesta simualció són:
+\begin{itemize}
+ \item Els temps d'espera en promig que han tingut tots els clients fins que ha arribat el seu autobús
+ \item El màxim de temps que ha hagut d'esperar alguna persona per pujar al seu autobús
+ \item La ocupació mitjana que han tingun els autobusos durant tot el recorregut
+ \item La ocupació màxima que hi ha hagut durant tota la execució en algún dels autobusos
+ \item La quantitat de vegades que ha succeït que es superés la capacitat màxima d'un autobús.
+\end{itemize}
+
+
+\textcolor{red}
+{
+Estudiar para una línia determinada y una asignación de recursos cómo se comporta: \\
+Respecto a los autobuses: \\
+- El total de steps de retraso que se ha producido en todos los autobuses \\
+- Los steps de retraso que se han producido en media entre todos los autobuses \\
+- Para cada autobús, el retraso medio que ha tenido en cada parada\\
+- El máximo retraso que ha habido entre todas las paradas \\
+- Cuantas veces ocurre que un autobús adelante al que tenía delante porque se ha retrasado \\
+\\
+Respecto a las paradas: \\
+- El tiempo medio que se han esperado las personas entre todas las paradas \\
+- El tiempo medio que se han esperado las personas en cada una de las paradas \\
+- El máximo de tiempo que ha tenido que esperar una persona a su autobús \\
+- En cada parada, el retraso medio que han ido teniendo los autobuses
+\\
+Respecto a los viajes: \\
+- Para cada autobús, la ocupación media que ha tenido durante el recorrido \\
+- La ocupación media que han tenido todos los autobuses en todo el tiempo \\
+- Para cada autobús, el máximo de ocupación que ha tenido en su recorrido \\
+- El máximo de ocupación que se ha producido entre todos los autobuses \\
+}
+\textcolor{red}{Para hacer esta parte revisarme la documentación sobre DoE y VV\&A o la bibliografía, y recordar los comentarios}
+
+\subsubsection{Tipologia}
+
+Les dades de sortia són principalment mitjanes, valor màxims i quantitat de incidències. Això és adequat ja que no es tracta d'una simulació en la que es tinguin en compte moments determinats, sino que es té en compte el comportament que hi ha hagut en conjunt al llarg del temps.
+
+\textcolor{red}
+{
+Los datos que sacamos son en general: \\
+- Medias \\
+- Cantidad de veces que algo ha pasado \\
+- Máximos producidos en algunas situaciones que podrán ser críticas \\
+}
+
+\subsubsection{Format}
+
+Les dades de sortida es treuen en una taula html que estarà situada en el directori output. Per conservar-les despres de vàries execucions és necessari canviar el nom dels fitxers o copiar-los fora del directori.
+
+S'ha escollit aquest format per tenir més comoditat en la lectura, però es podria haber escollit qualsevol altre.
+
+\textcolor{red}
+{
+Los datos los sacaremos en algún tipo de html, con una tabla todo chula, y todo esto \\
+Otra opción es sacarlo con CSV, que quizá es un poco más sencillo. 
+}
+
+\subsubsection{Estadístics a calcular}
+\textcolor{green}
+{
+No sé qué es lo que me está pidiendo. Quizá es hacer algún tipo de pregunta como: con qué probabilidad puede pasar esto? Si se trata de eso, justificaré que eso es otra parte del proyecto, en el que ya se tiene este simulador y uno se plantea más cosas. Esto es solo para ver la situación. \\
+Si se trata de alguna otra cosa, supongo que me lo saltaré
+}
+
+\subsubsection{Representació}
+
+Aquest és un model que és útil per a llarg termini. Té sentit per estudiar el que ha ocorregut de manera estadística després de la execució de forma continuada durant molt de temps. És per això que no té cap sentit tenir una representació gràfica en viu de tot el que s'està calculant. L'únic que és important són les dades finals.
+
+Per això no hi ha una representació gràfica durant l'execució. Aquest era un dels motius pels quals s'havia preferit disenyar la eina de simulació en comptes de fer servir una genérica: aquesta no requereix tants recursos, que en aquest cas son innecessaris.
+
+La representació de les dades es fa mitjançant un document html.
+
+\textcolor{red}
+{
+No hay ningún tipo de representación gráfica. Todo se hace de forma matemática y al final se sacan los datos. Puedo justificar esto diciendo que se trata de un tipo de modelo que funciona a largo plazo: no tiene ningún sentido lo que ha pasado en un instante determinado, sino lo que ha pasado en promedio. Por eso no hace falta ningún tipo de representación más que los datos
+}
+
+\section{Diseny d'experiments}
+
+Per fer experiments amb aquest simulador primer cal decidir quina és la prioritat que es tindrà. Podria ser el temps d'espera dels clients, o el preu a pagar per tenir més autobusos, o la falta d'eficiència pel fet de tenir autobusos gairebé buits, etc.
+
+Un cop que s'ha decidir qué és el que es vol millorar, s'ha de fer algun tipus d'estudi de quines seran les característiques que tindrà el terreny que es vol simular. Com que es tracta d'un simulador bastant genèric, és important coneixer realement quines seràn les paràdes que s'hauran de posar, la quantitat de persones que han de fer servir la línia, la situació de la carretera que s'ha de fer servir...
+
+Quan ja es tenen clares les dades, és necessari configurar correctament el simulador per que pugui reflexar correctament el mon real. Cal donar valor adequats al paràmetres d'entrada porque la simulació tingui sentit.
+
+Finalment, l'únic que s'ha de fer és realitzar vàries execucions amb el simulador i estudiar les dades obtingudes. Aquestes seràn útils per decidir quins canvis es faran en la ruta.
+
+En cas que es vagin fent canvis, caldrà iterar sobre aquest procés fins que s'adequi al resultat desitjat.
+
+\textcolor{red}
+{
+La forma de hacer experimentos es probar con una cierta asignación de autobuses, ver lo que pasa y tomar una decisión. Puesto que los temas que se quieren estudiar y lo que se quiere incentivar pueden ser muy variados y todos ellos se pueden estudiar con este simulador, no se especifican todos aquí \\
+De todos modos podemos poner algún ejemplo, del tipo: supón que mi prioridad es usar el mínimo número de buses sin que ninguno de ellos se llene hasta un cierto máximo. Entonces tenemos que hacer esto y esto otro. \\
+No sé si tengo que tener algún experimento ya realizado. Está claro que no tengo tiempo para eso. Tengo que escurrir el bulto de alguna forma
+}
+
+\textcolor{red}{Una primera aproximación del diseño experimental}
+\section{Resultat de la simulació}
+\textcolor{red}
+{
+Si tengo tiempo de realizar alguna ejecución, entonces pondré lo que haya visto. Creo que es importante ver el experimento como que queremos ver algo muy concreto, y estudiar esa cosa muy pequeña.
+}
+
+\section{Conclusions i recomanacions}
+\textcolor{green}
+{
+Supongo que esta es la clase de cosa que tengo que escribir al final, después de haberlo hecho todo, pues ya sabré qué es lo que hago y qué tengo que recomendar
+}
+
+\subsection{Anàlisi dels resultats obtinguts en el seu conjunt des de la perspectiva de les decisinons a prendre}
+\textcolor{green}
+{
+Lo mismo que en el anterior: esto tengo que hacerlo al final
+}
+
+\subsection{Possibles ampliacions de l'estudi}
+
+Aquest estudi es podria ampliar per fer simulació sobre temes que en aquest s'han ignorat. Algunes recomanacions podrien ser:
+\begin{itemize}
+ \item Afegir una cerca variabilitat en la aparició de nous clients en funció de l'hora i la ubicació.
+ \item Afegir horaris més complexes per a la sortida dels autobusos
+ \item Afegir les afectacions que poden haber-hi en la circulació degudes a embussos de transit, avaries o accidents.
+ \item Definir realment un límit a partir del qual ja no poden pujar més persones a l'autobus a causa de la capacitat
+ \item Afegir el factor de tenir espais reservats per a persones amb cadires de rodes o altes necessitats.
+ \item Estudiar el cost que té mantenir un cert horari a causa de la quantitat d'autobusos necessaris, el sou dels conductors, la reparació i manteniment del material...
+ \item Afegir en els càlculs els diners que paguen els clients per fer servir aquest servei
+ \item Estudiar models d'autobuso amb més d'una porta o altres sistemes per fer més ràpides les entrades.
+\end{itemize}
+
+
+\textcolor{red}
+{
+Las cosas que se podrían ampliar son: \\
+- Establecer algunas horas punta para las que llegan los clientes \\
+- Introducir modelos en los que los autobuses se generan con horarios, según la hora que sea \\
+- Estableces paradas que reciben más personas que otras \\
+- Estableces paradas que normalmente son más destino, y otras que normalmente son más origen \\
+- Añadir el posible estado de la circulación según la hora que sea \\
+- Añadir el factor de las averías en los autobuses \\
+- Establecer realmente un limite en la cantidad máxima de personas que pueden entrar en un autobús \\
+- Añadir el factor de tener asientos o gente de pie, espacios para gente con  sillas de ruedas o temas por el estilo \\
+- Añadir algo para medir el coste que tiene un cierto horario \\
+- Estudiar modelos de autobús con más de una puerta de entrada \\
+}
+
+
+
+
+
+\end{document}

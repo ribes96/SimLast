@@ -1,0 +1,27 @@
+\BOOKMARK [1][-]{section.1}{Descripci\363 del sistema}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Descripci\363 informal}{section.1}% 2
+\BOOKMARK [1][-]{section.2}{Objectius}{}% 3
+\BOOKMARK [2][-]{subsection.2.1}{Generals}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.2}{Espec\355fics}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Descripci\363 del model a implementar}{}% 6
+\BOOKMARK [1][-]{section.4}{Aspectes metodol\362gics}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Motor de simulaci\363 emprat}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Justificaci\363 de l'us del paradigma de simulaci\363}{section.4}% 9
+\BOOKMARK [1][-]{section.5}{Especificaci\363 en detall del model}{}% 10
+\BOOKMARK [2][-]{subsection.5.1}{Hip\362tesis de simulaci\363 usades}{section.5}% 11
+\BOOKMARK [3][-]{subsubsection.5.1.1}{Simplificadores}{subsection.5.1}% 12
+\BOOKMARK [3][-]{subsubsection.5.1.2}{Sist\350miques}{subsection.5.1}% 13
+\BOOKMARK [2][-]{subsection.5.2}{Objectes}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.3}{Par\340metres}{section.5}% 15
+\BOOKMARK [2][-]{subsection.5.4}{Variables d'estat}{section.5}% 16
+\BOOKMARK [2][-]{subsection.5.5}{Successos}{section.5}% 17
+\BOOKMARK [2][-]{subsection.5.6}{Dades d'entrada}{section.5}% 18
+\BOOKMARK [3][-]{subsubsection.5.6.1}{Taules explicatives de les dades}{subsection.5.6}% 19
+\BOOKMARK [3][-]{subsubsection.5.6.2}{Reflexi\363 sobre la aleatorietat dels processos}{subsection.5.6}% 20
+\BOOKMARK [3][-]{subsubsection.5.6.3}{Utilitat de la introducci\363 de la aleatorietat}{subsection.5.6}% 21
+\BOOKMARK [2][-]{subsection.5.7}{Variables de sortida}{section.5}% 22
+\BOOKMARK [3][-]{subsubsection.5.7.1}{Tipologia}{subsection.5.7}% 23
+\BOOKMARK [3][-]{subsubsection.5.7.2}{Format}{subsection.5.7}% 24
+\BOOKMARK [3][-]{subsubsection.5.7.3}{Representaci\363}{subsection.5.7}% 25
+\BOOKMARK [1][-]{section.6}{Diseny d'experiments}{}% 26
+\BOOKMARK [2][-]{subsection.6.1}{Possibles ampliacions de l'estudi}{section.6}% 27

@@ -1,0 +1,26 @@
+{
+  "bus_speed":1,
+  "buses":[
+    {
+      "label":"gran",
+      "capacity":50,
+      "proportion":0.25
+    },
+    {
+      "label":"mitja",
+      "capacity":30,
+      "proportion":0.5
+    },
+    {
+      "label":"petit",
+      "capacity":15,
+      "proportion":0.25
+    }
+    ],
+  "num_exec":5,
+  "load_time":0.25,
+  "bus_freq":10,
+  "people_freq":2,
+  "exec_steps":100,
+  "time_per_station":5
+}

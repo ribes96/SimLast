@@ -1,0 +1,6 @@
+El fichero que se llama "stations" debe contener
+varias líneas, y en cada una debe aparecer un número natural.
+Ese número indica la posición en la que hay una parada.
+No hace falta que esté ordenado, ni nada.
+Es importante que no haya ninguna letra, pues peta.
+Tampoco puede haber líneas en blanco, solo números

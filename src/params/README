@@ -1,0 +1,11 @@
+El document params conté tots els paràmetres que son necessaris
+per a l'execució, exepte la posició de les estacions, que està
+al directori anomenat "topology"
+
+S'ha de mantenir la sintaxi utilitzada per que s'executi sense problemes.
+
+Aconsellable llegir la documentació per veure el tipus
+de dades que pot tenir cada paràmetre.
+
+No és obligatori mantenir l'ordre que hi ha en el document d'exemple,
+es pot fer servir el que es vulgui.

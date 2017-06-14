@@ -1,0 +1,18 @@
+La informació que descriu el recorregut que han de fer els
+autobusos está a dins del directori "topology"
+
+Es tracta d'un document anomenat stations que conté diverses
+línies. A cada línia s'ha de indicar un número, que correspón
+a la posició que ocupa la parada en el recorregut.
+
+No cal que les estacions estiguin ordenades.
+
+S'entendrà que la estació amb un número més gran es la que indica
+el final del recorregut.
+
+És important que únicament hi hagi en el document línies amb
+números enters positius. Cap altre caràcter, ni tan sols
+salt de línia.
+
+Si no es compleix aquesta sintaxi l'execució pot donar resultats
+inestperats

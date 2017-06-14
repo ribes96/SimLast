@@ -1,0 +1,34 @@
+\select@language {catalan}
+\contentsline {section}{\numberline {1}Descripci\IeC {\'o} del sistema}{2}{section.1}
+\contentsline {subsection}{\numberline {1.1}Descripci\IeC {\'o} informal}{2}{subsection.1.1}
+\contentsline {section}{\numberline {2}Objectius}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Generals}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Espec\IeC {\'\i }fics}{3}{subsection.2.2}
+\contentsline {paragraph}{Respecte els autobusos}{3}{section*.2}
+\contentsline {paragraph}{Respecte les parades}{3}{section*.3}
+\contentsline {paragraph}{Respecte al recorreguts}{3}{section*.4}
+\contentsline {section}{\numberline {3}Descripci\IeC {\'o} del model a implementar}{3}{section.3}
+\contentsline {section}{\numberline {4}Aspectes metodol\IeC {\`o}gics}{4}{section.4}
+\contentsline {subsection}{\numberline {4.1}Motor de simulaci\IeC {\'o} emprat}{4}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Justificaci\IeC {\'o} de l'us del paradigma de simulaci\IeC {\'o}}{4}{subsection.4.2}
+\contentsline {section}{\numberline {5}Especificaci\IeC {\'o} en detall del model}{4}{section.5}
+\contentsline {subsection}{\numberline {5.1}Hip\IeC {\`o}tesis de simulaci\IeC {\'o} usades}{4}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}Simplificadores}{4}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}Sist\IeC {\`e}miques}{5}{subsubsection.5.1.2}
+\contentsline {subsection}{\numberline {5.2}Objectes}{5}{subsection.5.2}
+\contentsline {paragraph}{Autob\IeC {\'u}s}{6}{section*.5}
+\contentsline {paragraph}{Estaci\IeC {\'o}}{6}{section*.6}
+\contentsline {paragraph}{Persona}{6}{section*.7}
+\contentsline {subsection}{\numberline {5.3}Par\IeC {\`a}metres}{6}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Variables d'estat}{7}{subsection.5.4}
+\contentsline {subsection}{\numberline {5.5}Successos}{7}{subsection.5.5}
+\contentsline {subsection}{\numberline {5.6}Dades d'entrada}{7}{subsection.5.6}
+\contentsline {subsubsection}{\numberline {5.6.1}Taules explicatives de les dades}{8}{subsubsection.5.6.1}
+\contentsline {subsubsection}{\numberline {5.6.2}Reflexi\IeC {\'o} sobre la aleatorietat dels processos}{8}{subsubsection.5.6.2}
+\contentsline {subsubsection}{\numberline {5.6.3}Utilitat de la introducci\IeC {\'o} de la aleatorietat}{8}{subsubsection.5.6.3}
+\contentsline {subsection}{\numberline {5.7}Variables de sortida}{8}{subsection.5.7}
+\contentsline {subsubsection}{\numberline {5.7.1}Tipologia}{8}{subsubsection.5.7.1}
+\contentsline {subsubsection}{\numberline {5.7.2}Format}{9}{subsubsection.5.7.2}
+\contentsline {subsubsection}{\numberline {5.7.3}Representaci\IeC {\'o}}{9}{subsubsection.5.7.3}
+\contentsline {section}{\numberline {6}Diseny d'experiments}{9}{section.6}
+\contentsline {subsection}{\numberline {6.1}Possibles ampliacions de l'estudi}{9}{subsection.6.1}

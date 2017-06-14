@@ -1,0 +1,5 @@
+Mitjana de temps d'espera:14.0
+Màxim temps d'espera: 24
+Mitjana d'ocupació: 1.1618181818181819
+Màxim d'ocupació: 2
+Superació de capacitat màxima: 0
